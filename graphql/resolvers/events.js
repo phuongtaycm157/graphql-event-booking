@@ -1,4 +1,5 @@
 const Event = require('../../models/event');
+const User = require('../../models/user');
 const { transformEvent } = require('./merge');
 
 module.exports = {
@@ -14,20 +15,23 @@ module.exports = {
     };
   },
   // Mutation Event
-  createEvent: async args => {
+  createEvent: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('Unauthenticated!');
+    }
     const event = new Event({
       title: args.eventInput.title,
       description: args.eventInput.description,
       price: +args.eventInput.price,
       date: new Date(args.eventInput.date),
-      creator:"5fec5ba08c334f163ce649b3"
+      creator: req.userId
     })
-    let createdEvent;
     try {
-      const result = await event.save()
-      createdEvent = transformEvent(result);
+      const result = await event.save();
+      console.log(result);
+      let createdEvent = transformEvent(result);
 
-      const user = await User.findById('5fec5ba08c334f163ce649b3');
+      const user = await User.findById(req.userId);
       if (!user) {
         throw new Error('User doesn\'t exit!')
       }

@@ -8,9 +8,12 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const graphQlSchema = require('./graphql/schema/index')
-const graphQlResolve = require('./graphql/resolvers/index')
+const graphQlResolve = require('./graphql/resolvers/index');
+const isAuth = require('./middleware/is-auth');
 
 app.use(bodyParser.json());
+
+app.use(isAuth);
 
 app.use(
   '/graphql',
